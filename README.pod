@@ -1,0 +1,114 @@
+NAME
+    Sort::Human
+
+DESCRIPTION
+    Provides some alternate functions for sorting lists in ways that are
+    more natural to the way people generally sort items.
+
+    Perl traditionally provides two types of sort. Numeric (<=>) which when
+    given a list of numbers will sort them numerically the way you would
+    expect and alphanumeric which sorts into alphabetical order. The issue
+    arises when list items are a mix of numbers and letters. In this case it
+    we really have to use an alphanumeric sort which follows the standard
+    method of comparing the letters and numbers one at a time. Which results
+    in the following examples:
+
+      abc123
+      abc124
+      acc123
+      acc124 <-- pretty normal so far...
+      add1
+      add10
+      add2   <-- Huh? Isn't 2 < 10? Yes, but that's not the comparison perl
+                 makes because it isnt comparing numbers but rather strings
+                 and thus after comparing the 2nd 'd' without determining
+                 a result (they're both the same to that point), instead of
+                 comparing 2 and 10, it actually only compares 2 and 1.
+                 1 < 2 and therefore add10 comes before add2.
+
+    Sort::Human will try to sort the list in such a way that add2 (read
+    add-two) comes before add10 (read add-ten, not add-1-0).
+
+SYNOPSIS
+      #use the module and import the desired functions if desired.
+      use Sort::Human qw(sortCaseInsensitive);
+  
+      my @list = ( 'item 1', 'item 10', 'item 2' );
+  
+      my @sorted = sortCaseInsensitive(@list);
+  
+      print "@sorted\n";
+      # item 1 item 2 item 10
+
+EXPORTS
+    Exports the following functions on request. None are exported by
+    default.
+
+    sortCaseInsensitive() sortCaseSensitive() sortCaseInsensitiveBlock()
+    sortCaseSensitiveBlock()
+
+FUNCTIONS
+  sortCaseInsensitive
+    Requires a list of items to sort or a reference to an array containing
+    the items to sort.
+
+    Returns a list or reference to a list depending on the calling context
+    sorted naturally ignoring case. I.e. 'a' eq 'A'.
+
+  sortCaseSensitive
+    Requires a list of items to sort or a reference to an array containing
+    the items to sort.
+
+    Returns a list or reference to a list depending on the calling context
+    sorted naturally case sensitivity. I.e. 'a' > 'A'.
+
+  sortCaseInsensitiveBlock
+    Requires 2 scalars to compare and determine order. This function is
+    provided to be used in a sort() block so that if the items in your list
+    to sort are complex data structures and you wish to sort based on a
+    particular value in those structures you can do so. E.g. Assume a list
+    of array refs and we want to sort the outer list based on the first
+    element of each inner array:
+
+      my @list = ( ['item 1',  'item '1], 
+                   ['item 10', 'item '2], 
+                   ['item 2',  'item '3], 
+                 );
+      my @sorted = sort { sortCaseInsensitiveBlock($a->[0],$b->[0]) } @list;
+  
+      print Dumper(\@sorted);
+  
+      # $VAR1 = ( 
+      #           ['item 1',  'item '1], 
+      #           ['item 2',  'item '3], 
+      #           ['item 10', 'item '2], 
+      #         );
+
+    Returns a list or reference to a list depending on the calling context
+    sorted naturally with case insensitivity. I.e. 'a' eq 'A'.
+
+  sortCaseSensitiveBlock
+    Requires 2 scalars to compare and determine order. This function is
+    provided to be used in a sort() block so that if the items in your list
+    to sort are complex data structures and you wish to sort based on a
+    particular value in those structures you can do so. E.g. Assume a list
+    of array refs and we want to sort the outer list based on the first
+    element of each inner array:
+
+      my @list = ( ['item 1',  'item '1], 
+                   ['item 10', 'item '2], 
+                   ['item 2',  'item '3], 
+                 );
+      my @sorted = sort { sortCaseInsensitiveBlock($a->[0],$b->[0]) } @list;
+  
+      print Dumper(\@sorted);
+  
+      # $VAR1 = ( 
+      #           ['item 1',  'item '1], 
+      #           ['item 2',  'item '3], 
+      #           ['item 10', 'item '2], 
+      #         );
+
+    Returns a list or reference to a list depending on the calling context
+    sorted naturally with case sensitivity. I.e. 'a' > 'A'.
+
